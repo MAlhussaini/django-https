@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,12 +21,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-bx!e0z4i6)gqxnim#haj7%@38nw$n35x98jk0b&a^s(%u0=6hz'
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY','SUPERSECRETKEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = bool(int(os.environ.get('DJANGO_DEBUG',0)))
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [] if DEBUG else os.environ.get('DJANGO_ALLOWED_HOSTS').split(',')
 
 
 # Application definition
@@ -117,6 +118,10 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
 STATIC_URL = 'static/'
+# MEDIA_URL = 'static/'
+
+# STATIC_ROOT = 
+# MEDIA_ROOT = 
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
