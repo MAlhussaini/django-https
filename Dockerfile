@@ -2,6 +2,7 @@
 FROM python:3.10-alpine3.16
 # tells python to not buffer the outputs (prints all outputs to the consol)
 ENV PYTHONUNBUFFERED 1
+ENV PATH="/scripts:${PATH}"
 
 # Copy requirements file to the docker image
 COPY ./requirements.txt /requirements.txt
