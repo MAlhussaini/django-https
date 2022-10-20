@@ -4,28 +4,34 @@ services:
   app:
     build:
       context: .
-    restart: always
+    volumes: # Map app folder on the PC to the docker container (Auto-refrech)
+      - static_data:/vol/web
     environment:
       - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
       - DJANGO_DEBUG=0
       - DJANGO_ALLOWED_HOSTS=${DOMAIN}
-  
+      - DJANGO_SUPERUSER_EMAIL=${DJANGO_SUPERUSER_EMAIL}
+      - DJANGO_SUPERUSER_USERNAME=${DJANGO_SUPERUSER_USERNAME}
+      - DJANGO_SUPERUSER_PASSWORD=${DJANGO_SUPERUSER_PASSWORD}
+    depends_on:
+      - db
+    restart: always
   proxy:
     build:
       context: ./docker/proxy
-    restart: always
-    depends_on:
-      - app
-    ports:
-      - 80:80
-      - 443:443
-    
     volumes:
       - certbot-web:/vol/www
       - proxy-dhparams:/vol/proxy
       - certbot-certs:/etc/letsencrypt
+      - static_data:/vol/static
+    ports:
+      - 80:80
+      - 443:443
     environment:
       - DOMAIN=${DOMAIN}
+    depends_on:
+      - app
+    restart: always
 
   certbot:
     build: 
@@ -40,10 +46,16 @@ services:
     
     depends_on:
       - proxy
+  db:
+    image: postgres
+    # restart: always
+    environment:
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
 
 # empty collon : to not specify specific path and let docker manage the path
 # and we will be able to manage the paths based on the name given for each path
 volumes:
+  static_data:
   certbot-web:
   proxy-dhparams:
   certbot-certs:

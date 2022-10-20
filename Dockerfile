@@ -19,8 +19,18 @@ RUN apk add --upgrade --no-cache build-base linux-headers && \
 COPY app/ /app
 WORKDIR /app
 
+COPY ./scripts /scripts
+RUN chmod +x /scripts/*
+
+RUN mkdir -p /vol/web/media
+RUN mkdir -p /vol/web/
+
 RUN adduser --disabled-password --no-create-home django
+
+RUN chown -R django:django /vol
+RUN chmod -R 755 /vol/web
 
 USER django
 
-CMD ["uwsgi","--socket",":9000","--workers","4","--master","--enable-threads","--module","app.wsgi"]
+CMD [ "entrypoint.sh" ]
+# CMD ["uwsgi","--socket",":9000","--workers","4","--master","--enable-threads","--module","app.wsgi"]
